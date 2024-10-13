@@ -46,6 +46,7 @@ def change_brightness(image, brightness_factor):
         numpy array: The image with adjusted brightness.
     """
     try:
+        # image = image.astype('float32')
         # Scale the image by the brightness factor
         output = image * brightness_factor
 

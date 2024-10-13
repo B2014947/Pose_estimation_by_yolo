@@ -9,7 +9,6 @@ from PyQt5.QtWidgets import QComboBox, QLabel, QPushButton, QGroupBox, QRadioBut
 
 from app_controllers.controller import Controller
 from app_controllers.utils.camera_helper import get_connected_camera_alias
-from app_controllers.utils.update_helper import is_update
 from app_views.about_view import AboutWindow
 from app_views.threads.worker_thread_pause_screen import WorkerThreadPauseScreen
 from app_views.threads.worker_thread_system_resource import WorkerThreadSystemResource
@@ -28,7 +27,7 @@ class View(QMainWindow):
         # element x coordinate
         self.button_line_x = 15
         self.model = model
-        self.setWindowTitle('Sitting Posture Detector [commit {} - {}]'.format(model.get_commit_hash(), is_update()))
+        self.setWindowTitle('Sitting Posture Detector')
         self.setGeometry(100, 100, self.gui_width, self.gui_height)
         self.setFixedSize(self.gui_width, self.gui_height)
         # Set icon

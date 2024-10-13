@@ -12,7 +12,7 @@ class InferenceModel:
     def __init__(self, model_name):
         self.model_name = model_name
         # path to inference_models
-        self.model_path = Path('./data/inference_models/{}'.format(model_name))
+        self.model_path = Path('/mnt/d/poseture_estimated_by_yolo/SittingPostureDetection/data/inference_models/{}'.format(model_name))
         print(self.model_name + ' loaded')
         print('cuda available: ' + str(torch.cuda.is_available()))
         if torch.cuda.is_available():
