@@ -18,9 +18,9 @@ class WorkerThreadFrame(QtCore.QThread):
         self.model = model
         self.view = view
         self.inference_model = model.inference_model
-        self.slider_brightness = view.slider_brightness
+        # self.slider_brightness = view.slider_brightness
         self.button_rotate = view.button_rotate
-        self.slider_contrast = view.slider_contrast
+        # self.slider_contrast = view.slider_contrast
         # Place the camera object in the WorkThread
         self.frame = None
         # read current selected camera id
@@ -49,9 +49,9 @@ class WorkerThreadFrame(QtCore.QThread):
                     frame_count = 0
                     start_time = time.time()
             # change brightness based on slider value
-            self.frame = change_brightness(self.frame, self.slider_brightness.value() / 100)
-            # change contrast based on slider value
-            self.frame = change_contrast(self.frame, self.slider_contrast.value() / 100)
+            # self.frame = change_brightness(self.frame, self.slider_brightness.value() / 100)
+            # # change contrast based on slider value
+            # self.frame = change_contrast(self.frame, self.slider_contrast.value() / 100)
             self.check_orientation()
             self.check_rotation()
             # predict using inference_models

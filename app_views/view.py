@@ -26,7 +26,7 @@ class View(QMainWindow):
         # element x coordinate
         self.button_line_x = 15
         self.model = model
-        self.setWindowTitle('Sitting Posture Detector')
+        self.setWindowTitle('Sitting Posture Detector'.format(model.get_commit_hash()))
         self.setGeometry(100, 100, self.gui_width, self.gui_height)
         self.setFixedSize(self.gui_width, self.gui_height)
         # Set icon
@@ -85,13 +85,11 @@ class View(QMainWindow):
         self.button_stop.move(310, self.button_line_x)
 
         # refresh button properties
-        self.button_refresh = QPushButton('', self)
+        self.button_refresh = QPushButton('Refresh', self)
         self.button_refresh.setToolTip('Refresh camera list')
-        self.button_refresh.setFixedHeight(28)
-        self.button_refresh.setFixedWidth(28)
+        self.button_refresh.setFixedHeight(29)
+        self.button_refresh.setFixedWidth(80)
         self.button_refresh.move(395, self.button_line_x)
-        self.button_refresh.setIcon(QIcon('data/images/refresh.png'))
-        self.button_refresh.setIconSize(QSize(22, 22))
 
         # info button properties
         self.button_information = QPushButton('', self)
@@ -136,7 +134,26 @@ class View(QMainWindow):
         self.button_rotate.setIcon(QIcon('data/images/rotate.png'))
         self.button_rotate.setIconSize(QSize(25, 25))
 
-      
+        # radio buttons properties
+        self.current_rb_selected = None
+        self.button_group = QButtonGroup(self)
+        self.radiobutton_bl = QRadioButton('Bottom-left', self.groupbox_frame_options)
+        self.radiobutton_bl.move(10, 65)
+        self.radiobutton_bl.setToolTip('Displays information in the bottom-left corner')
+        self.radiobutton_br = QRadioButton('Bottom-right', self.groupbox_frame_options)
+        self.radiobutton_br.move(110, 65)
+        self.radiobutton_br.setToolTip('Displays information in the bottom-right corner')
+        self.radiobutton_tl = QRadioButton('Top-left', self.groupbox_frame_options)
+        self.radiobutton_tl.move(10, 30)
+        self.radiobutton_tl.setToolTip('Displays information in the top-left corner')
+        self.radiobutton_tr = QRadioButton('Top-right', self.groupbox_frame_options)
+        self.radiobutton_tr.move(110, 30)
+        self.radiobutton_tr.setToolTip('Displays information in the top-right corner')
+        self.radiobutton_bl.setChecked(True)
+        self.button_group.addButton(self.radiobutton_bl, 1)
+        self.button_group.addButton(self.radiobutton_br, 2)
+        self.button_group.addButton(self.radiobutton_tl, 3)
+        self.button_group.addButton(self.radiobutton_tr, 4)
 
         # checkbox properties
         self.cbox_enable_bbox = QCheckBox('Bounding box', self.groupbox_frame_options)
@@ -180,22 +197,30 @@ class View(QMainWindow):
         self.timer_start = QTimer()
         self.timer_stop = QTimer()
 
+        # Color box buttons
         self.button_color_box = QPushButton('', self.groupbox_frame_options)
-        self.button_color_box.move(140, 118)
         self.button_color_box.setFixedHeight(20)
         self.button_color_box.setFixedWidth(20)
         self.button_color_class = QPushButton('', self.groupbox_frame_options)
-        self.button_color_class.move(140, 178)
         self.button_color_class.setFixedHeight(20)
         self.button_color_class.setFixedWidth(20)
         self.button_color_confidence = QPushButton('', self.groupbox_frame_options)
-        self.button_color_confidence.move(140, 148)
         self.button_color_confidence.setFixedHeight(20)
         self.button_color_confidence.setFixedWidth(20)
         self.button_color_bg = QPushButton('', self.groupbox_frame_options)
-        self.button_color_bg.move(140, 208)
         self.button_color_bg.setFixedHeight(20)
         self.button_color_bg.setFixedWidth(20)
+
+        # Move buttons to align with the labels, centered horizontally
+        button_x_position = 140  # Position for the color buttons
+        button_offset = -5  # Horizontal offset to ensure centering
+
+        self.button_color_box.move(button_x_position, 118+button_offset)  # Bounding Box
+        self.button_color_class.move(button_x_position, 178+button_offset)  # Class
+        self.button_color_confidence.move(button_x_position, 148+button_offset)  # Confidence
+        self.button_color_bg.move(button_x_position, 208+button_offset)  # Background
+
+        # Set the colors as needed from the model
         self.button_color_box.setStyleSheet(
             f"background-color: rgb({model.box_color[0]}, {model.box_color[1]}, {model.box_color[2]});border: none")
         self.button_color_class.setStyleSheet(
@@ -205,7 +230,48 @@ class View(QMainWindow):
         self.button_color_bg.setStyleSheet(
             f"background-color: rgb({model.text_color_bg[0]}, {model.text_color_bg[1]}, {model.text_color_bg[2]});border: none")
 
+        # self.checkbox_enable_debug = QCheckBox('Debug info', self.groupbox_frame_options)
+        # self.checkbox_enable_debug.move(10, 400)
+        # self.checkbox_enable_debug.setToolTip('Enable/Disable debug information in the status bar')
+        # self.checkbox_enable_debug.setChecked(True)
 
+        # slider properties - brightness
+        # self.label_brightness_control = QLabel('Brightness:', self.groupbox_frame_options)
+        # self.label_brightness_control.move(10, 245)
+        # self.slider_brightness = QSlider(Qt.Horizontal, self.groupbox_frame_options)
+        # self.slider_brightness.move(10, 265)
+        # self.slider_brightness.setFixedWidth(100)
+        # self.slider_brightness.setMinimum(0)
+        # self.slider_brightness.setMaximum(300)
+        # self.slider_brightness.setValue(100)
+        # self.slider_brightness.setSingleStep(1)
+        # self.slider_brightness.setTickInterval(10)
+        # self.label_brightness_control = QLabel(str(self.slider_brightness.value()) + '%', self.groupbox_frame_options)
+        # self.label_brightness_control.move(115, 270)
+
+        # # slider properties - contrast
+        # self.label_contrast_control = QLabel('Contrast:', self.groupbox_frame_options)
+        # self.label_contrast_control.move(10, 290)
+        # self.slider_contrast = QSlider(Qt.Horizontal, self.groupbox_frame_options)
+        # self.slider_contrast.move(10, 310)
+        # self.slider_contrast.setFixedWidth(100)
+        # self.slider_contrast.setMinimum(0)
+        # self.slider_contrast.setMaximum(300)
+        # self.slider_contrast.setValue(100)
+        # self.slider_contrast.setSingleStep(1)
+        # self.slider_contrast.setTickInterval(10)
+        # self.label_contrast_control = QLabel(str(self.slider_contrast.value()) + '%', self.groupbox_frame_options)
+        # self.label_contrast_control.move(115, 315)
+
+        # self.button_reset_brightness = QPushButton('Reset', self.groupbox_frame_options)
+        # self.button_reset_contrast = QPushButton('Reset', self.groupbox_frame_options)
+
+        # self.button_reset_brightness.setFixedWidth(68)
+        # self.button_reset_brightness.setFixedHeight(20)
+        # self.button_reset_contrast.setFixedWidth(68)
+        # self.button_reset_contrast.setFixedHeight(20)
+        # self.button_reset_contrast.move(160, 312)
+        # self.button_reset_brightness.move(160, 267)
 
         self.checkbox_switch_bbox_mode = QCheckBox('Default bounding box color', self.groupbox_frame_options)
         self.checkbox_switch_bbox_mode.move(10, 430)
@@ -222,82 +288,81 @@ class View(QMainWindow):
         model.worker_thread_pause_screen.update_pause_screen.connect(Controller.update_pause_frame)
         model.worker_thread_pause_screen.start()
 
-        # start pause screen thread
-
         # disable stop button on start
         self.button_stop.setEnabled(False)
 
         # set all groupboxes to specific color
-        for groupBox in self.findChildren(QGroupBox):
-            groupBox.setStyleSheet('QGroupBox {background-color: #323844;font-weight: bold;}')
+        # for groupBox in self.findChildren(QGroupBox):
+        #     groupBox.styleSheet() + """QGroupBox {background-color: #323844;}"""
+            #groupBox.setStyleSheet('QGroupBox {background-color: #323844;}')
 
-        for groupBox in self.findChildren(QGroupBox):
-            for widget in groupBox.findChildren(QWidget):
-                if not isinstance(widget, QPushButton):
-                    widget.setStyleSheet('background-color: #323844;font-weight: bold;')
+        # for groupBox in self.findChildren(QGroupBox):
+        #     for widget in groupBox.findChildren(QWidget):
+        #         if not isinstance(widget, QPushButton):
+        #             #widget.styleSheet() + """QWidget {background-color: #323844;}"""
+        #             widget.setStyleSheet('background-color: #323844;')
+        # self.button_reset_brightness.setStyleSheet('QPushButton {'
+        #                                            'font-size: 10px;}'
+        #                                            'QPushButton:enabled {'
+        #                                            'background-color: #4269b9;'
+        #                                            'border: 1px solid white;}'
+        #                                            'QPushButton:enabled:hover {'
+        #                                            'background-color: #2c4f7a;}'
+        #                                            )
+        # self.button_reset_contrast.setStyleSheet('QPushButton {'
+        #                                          'font-size: 10px;}'
+        #                                          'QPushButton:enabled {'
+        #                                          'background-color: #4269b9;'
+        #                                          'border: 1px solid white;}'
+        #                                          'QPushButton:enabled:hover {'
+        #                                          'background-color: #2c4f7a;}'
+        #                                          )
         self.button_rotate.setStyleSheet('QPushButton {'
                                          'font-size: 10px;}'
                                          'QPushButton:enabled {'
                                          'background-color: #4269b9;'
                                          'border: 1px solid white;}'
                                          'QPushButton:enabled:hover {'
-                                         'background-color: #2c4f7a;}'
-                                         'QToolTip {background-color: #323844; font-weight: bold; }')
+                                         'background-color: #2c4f7a;}')
         self.button_flip_horizontal.setStyleSheet('QPushButton {'
                                                   'font-size: 10px;}'
                                                   'QPushButton:enabled {'
                                                   'background-color: #4269b9;'
                                                   'border: 1px solid white;}'
                                                   'QPushButton:enabled:hover {'
-                                                  'background-color: #2c4f7a;}'
-                                                  'QToolTip {background-color: #323844; font-weight: bold; }')
+                                                  'background-color: #2c4f7a;}')
         self.button_flip_vertical.setStyleSheet('QPushButton {'
                                                 'font-size: 10px;}'
                                                 'QPushButton:enabled {'
                                                 'background-color: #4269b9;'
                                                 'border: 1px solid white;}'
                                                 'QPushButton:enabled:hover {'
-                                                'background-color: #2c4f7a;}'
-                                                'QToolTip {background-color: #323844; font-weight: bold; }')
-        self.button_refresh.setStyleSheet(f'QPushButton:enabled {{'
-                                          f'background-color: #4269b9;'
-                                          f'border-radius : {28 / 2};'
-                                          f'background-color: #4269b9;'
-                                          f'border: 1px solid white;}}'
-                                          f'QPushButton:disabled {{'
-                                          f'border-radius : {28 / 2};'
-                                          f'border: 1px solid white;}}'
-                                          f'QPushButton:enabled:hover {{'
-                                          f'background-color: #2c4f7a;}}'
-                                          f'QToolTip {{background-color: #323844; font-weight: bold; }}')
+                                                'background-color: #2c4f7a;}')
+        self.button_refresh.setStyleSheet('QPushButton:enabled {'
+                                          'background-color: #4269b9;'
+                                          'border: 1px solid white;}'
+                                          'QPushButton:enabled:hover {'
+                                          'background-color: #2c4f7a;}')
         self.button_information.setStyleSheet(f'QPushButton {{'
                                               f'background-color: #4269b9;'
                                               f'border-radius : {size / 2};'
                                               f'border: none;}}'
                                               f'QPushButton:enabled:hover {{'
-                                              f'background-color: #2c4f7a;}}'
-                                              f'QToolTip {{background-color: #323844; font-weight: bold;}}')
+                                              f'background-color: #2c4f7a;}}')
 
         self.button_start.setStyleSheet('QPushButton:enabled {'
                                         'background-color: #4269b9;'
                                         'border: 1px solid white;}'
                                         'QPushButton:enabled:hover {'
-                                        'background-color: #2c4f7a;}'
-                                        'QToolTip {background-color: #323844;'
-                                        ' font-weight: bold; }')
+                                        'background-color: #2c4f7a;}')
         self.button_stop.setStyleSheet('QPushButton:enabled {'
                                        'background-color: #4269b9;'
                                        'border: 1px solid white;}'
                                        'QPushButton:enabled:hover {'
-                                       'background-color: #2c4f7a;}'
-                                       'QToolTip {background-color: #323844;'
-                                       ' font-weight: bold; }')
+                                       'background-color: #2c4f7a;}')
         self.button_fullscreen.setStyleSheet('QPushButton:enabled {'
                                              'background-color: transparent;'
-                                             'border: none;}'
-                                             'QToolTip {background-color: #323844;'
-                                             'font-weight: bold;'
-                                             'border: none}')
+                                             'border: none;}')
         self.button_flip_horizontal.pressed.connect(
             lambda: Controller.on_button_pressed(self.button_flip_horizontal, 'data'
                                                                               '/images'
@@ -335,14 +400,6 @@ class View(QMainWindow):
                                                                                                              '/images'
                                                                                                              '/fullscreen_icon'
                                                                                                              '.png'))
-        self.button_refresh.pressed.connect(lambda: Controller.on_button_pressed(self.button_refresh, 'data'
-                                                                                                      '/images'
-                                                                                                      '/refresh_pressed'
-                                                                                                      '.png'))
-        self.button_refresh.released.connect(lambda: Controller.on_button_pressed(self.button_refresh, 'data'
-                                                                                                       '/images'
-                                                                                                       '/refresh'
-                                                                                                       '.png'))
         self.button_information.pressed.connect(lambda: Controller.on_button_pressed(self.button_information, 'data'
                                                                                                               '/images'
                                                                                                               '/information_pressed'
@@ -352,6 +409,11 @@ class View(QMainWindow):
                                                                                                                '/information'
                                                                                                                '.png'))
 
+        # self.checkbox_enable_debug.stateChanged.connect(lambda: Controller.set_debug_mode(self))
+        # self.slider_brightness.valueChanged.connect(
+        #     lambda: Controller.update_slider_text(self.slider_brightness, self.label_brightness_control))
+        # self.slider_contrast.valueChanged.connect(
+        #     lambda: Controller.update_slider_text(self.slider_contrast, self.label_contrast_control))
 
         self.combobox_camera_list.currentTextChanged.connect(
             lambda: Controller.on_combobox_camera_list_changed(self, model))
@@ -367,12 +429,15 @@ class View(QMainWindow):
             lambda: Controller.show_color_picker(model, 'color_conf', self.button_color_confidence))
         self.button_color_bg.clicked.connect(
             lambda: Controller.show_color_picker(model, 'color_bg', self.button_color_bg))
+        # self.button_reset_brightness.clicked.connect(lambda: self.slider_brightness.setValue(100))
+        # self.button_reset_contrast.clicked.connect(lambda: self.slider_contrast.setValue(100))
         self.button_rotate.clicked.connect(lambda: Controller.update_frame_rotation_degrees(model))
         self.button_flip_vertical.clicked.connect(lambda: Controller.update_frame_flip_vertical(model))
         self.button_flip_horizontal.clicked.connect(lambda: Controller.update_frame_flip_horizontal(model))
         self.button_fullscreen.clicked.connect(lambda: Controller.show_fullscreen(model))
         self.button_refresh.clicked.connect(lambda: Controller.update_combobox_camera_list_items(self, model))
         self.checkbox_switch_bbox_mode.stateChanged.connect(lambda: Controller.set_bbox_mode(self, model))
+        # self.view_about = AboutWindow(self, model)
         self.button_information.clicked.connect(lambda: Controller.show_about_view(self))
 
     def closeEvent(self, event):
